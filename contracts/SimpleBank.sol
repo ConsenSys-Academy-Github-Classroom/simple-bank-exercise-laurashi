@@ -11,32 +11,34 @@ contract SimpleBank {
     /* State variables
      */
     
-    
-    // Fill in the visibility keyword. 
+    // Fill in the visibility keyword.
     // Hint: We want to protect our users balance from other contracts
-    mapping (address => uint) balances ;
+    // done
+    mapping (address => uint) internal balances;
     
     // Fill in the visibility keyword
     // Hint: We want to create a getter function and allow contracts to be able
     //       to see if a user is enrolled.
-    mapping (address => bool) enrolled;
+    // done
+    mapping (address => bool) public enrolled;
 
     // Let's make sure everyone knows who owns the bank, yes, fill in the
     // appropriate visilibility keyword
-    address owner = msg.sender;
+    // done
+    address public owner = msg.sender;
     
     /* Events - publicize actions to external listeners
      */
     
     // Add an argument for this event, an accountAddress
-    event LogEnrolled();
+    event LogEnrolled(address accountAddress);
 
     // Add 2 arguments for this event, an accountAddress and an amount
-    event LogDepositMade();
+    event LogDepositMade(address accountAddress, uint amount);
 
     // Create an event called LogWithdrawal
     // Hint: it should take 3 arguments: an accountAddress, withdrawAmount and a newBalance 
-    event LogWithdrawal();
+    event LogWithdrawal(address accountAddress, uint withdrawAmount, uint newBalance);
 
     /* Functions
      */
@@ -47,6 +49,9 @@ contract SimpleBank {
     // Added so ether sent to this contract is reverted if the contract fails
     // otherwise, the sender's money is transferred to contract
     function () external payable {
+        if (msg.value > 0) {
+          emit LogDepositMade(msg.sender, msg.value);
+	      }
         revert();
     }
 
@@ -63,6 +68,13 @@ contract SimpleBank {
     // Emit the appropriate event
     function enroll() public returns (bool){
       // 1. enroll of the sender of this transaction
+      enrolled[msg.sender] = true;
+
+      emit LogEnrolled(msg.sender);
+
+      return enrolled[msg.sender];
+  
+    
     }
 
     /// @notice Deposit ether into bank
